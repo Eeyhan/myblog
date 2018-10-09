@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>博客首页</title>
+    <link rel="stylesheet" href="/static/blogs/css/bootstrap.css">
+    <script type="text/javascript" src="/static/blogs/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/static/blogs/js/bootstrap.min.js"></script>
+    <style>
+        .container{
+            margin-top:70px;
+        }
+        .glyphicon {
+            vertical-align: -1px;
+            color: #8c8c8c;
+            margin-right: 5px;
+        }
+        .article_upcount_box{
+            float: left;
+            width: 46px;
+            height: 52px;
+            background: url(/static/blogs/img/upup.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            text-indent: 0;
+        }
+        .article_upcount{
+            line-height: 2.2em;
+            font-size: 14px;
+            color: #075db3;
+
+        }
+        .content_box{
+            margin-left: 10%;
+        }
+        .athor_info{
+            color: #555;
+            padding-top: 5px;
+            margin-left: 10px;
+        }
+
+        .glyphicon-comment,.glyphicon-check{
+            margin-left: 2%;
+        }
+
+        .content_desc{
+            line-height: 1.8em;
+            margin-bottom: 5px;
+            color: #333;
+            overflow: hidden;
+            padding-right: 5px;
+            font-size: 12px;
+            padding-top: 5px;
+        }
+        .content{
+            margin-bottom: 2%;
+        }
+        .content img{
+            height: 48px;
+            width: 48px;
+            padding: 1px;
+            margin-top: 8px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            float: left;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">博客园区</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">随笔<span class="sr-only">(current)</span></a></li>
+                    <li><a href="#">热点</a></li>
+                    <li><a href="#">文章</a></li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                {# 判断登录与否#}
+                    {% if request.user.is_authenticated %}
+                        <li><a href="/{{ request.user }}"><span class="glyphicon glyphicon-user"></span>{{ request.user }}</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                               aria-expanded="false">选项管理<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/backend">&nbsp;&nbsp;&nbsp; 后台管理</a></li>
+                                <li><a href="#">&nbsp;&nbsp;&nbsp; 随笔文章</a></li>
+                                <li><a href="#">&nbsp;&nbsp;&nbsp; 个人资料</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="/logout">&nbsp;&nbsp;&nbsp; 注销账户</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li><a href="/login">登录</a></li>
+                        <li><a href="/register">注册</a></li>
+                    {% endif %}
+
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="panel panel-primary">
+                  <div class="panel-heading">Panel heading without title</div>
+                  <div class="panel-body">
+                    Panel content
+                  </div>
+                </div>
+
+                <div class="panel panel-danger">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Panel title</h3>
+                  </div>
+                  <div class="panel-body">
+                    Panel content
+                  </div>
+                </div>
+                <div class="panel panel-info">
+                  <div class="panel-heading">Panel heading without title</div>
+                  <div class="panel-body">
+                    Panel content
+                  </div>
+                </div>
+
+                <div class="panel panel-warning">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Panel title</h3>
+                  </div>
+                  <div class="panel-body">
+                    Panel content
+                  </div>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                {% for article in article_list %}
+                    <div class="form-group">
+                        <div class="article_upcount_box">
+                            <span class="article_upcount">{{ article.up_count }}</span>
+                        </div>
+                        <div class="content_box">
+                            <div class="content">
+                                <a href="/{{ article.user.username }}/article/{{ article.id }}"><h4>{{ article }}</h4></a>
+                                <a href="/{{ article.user }}"><img src="/media/{{ article.user.avatar }}"></a>
+                                <P class="content_desc">{{ article.desc }}</P>
+                            </div>
+                            <div class="athor_info">
+                                <a href="/{{ article.user }}">{{ article.user }}</a><span> 发布于</span>
+                                <span>{{ article.create_time|date:'Y-m-d H:i:s' }}</span>
+                                <span class="glyphicon glyphicon-comment"></span><span>评论({{ article.comment_count }})</span>
+                                <span class="glyphicon glyphicon-check"></span><span>阅读(0)</span>
+                            </div>
+                        </div>
+
+
+                        <hr>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="panel panel-primary">
+                  <div class="panel-heading">Panel heading without title</div>
+                  <div class="panel-body">
+                    Panel content
+                  </div>
+                </div>
+
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Panel title</h3>
+                  </div>
+                  <div class="panel-body">
+                    Panel content
+                  </div>
+                </div>
+                <div class="panel panel-warning">
+                  <div class="panel-heading">Panel heading without title</div>
+                  <div class="panel-body">
+                    Panel content
+                  </div>
+                </div>
+
+                <div class="panel panel-success">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Panel title</h3>
+                  </div>
+                  <div class="panel-body">
+                    Panel content
+                  </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

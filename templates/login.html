@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <link rel="stylesheet" href="/static/blogs/css/bootstrap.css">
+    <script type="text/javascript" src="/static/blogs/js/jquery-3.3.1.min.js"></script>
+    <style>
+        #valid_code_img{
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3 class="btn btn-danger">用户登录</h3>
+    <div class="row">
+        <div class="col-md-4 col-lg-offset-4">
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="user">用户名</label>
+                    <input type="text" id="user" class="form-control" name="user">
+                </div>
+                <div class="form-group">
+                    <label for="pwd">密码</label>
+                    <input type="password" id="pwd" class="form-control" name="pwd">
+                </div>
+
+                <div class="form-group">
+                    <label for="valid_code">验证码</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="valid_code">
+                        </div>
+                        <div class="col-md-6">
+                            <img width="170" height="30" id="valid_code_img" src="/get_validCode_img/" alt="">
+                        </div>
+                    </div>
+                </div>
+
+                <p class="error"></p>
+                <input type="button" class="btn btn-primary login_btn btn-block" value="立即登录">
+                <a href="/register/" class="btn btn-default btn-block">没有账号?</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    $(function(){
+        $('#valid_code_img').click(function(){
+            $(this)[0].src += '?'
+        });
+
+        {#定义一个ajax请求函数#}
+        function userlogin(){
+            $.ajax({
+                url:'',
+                type:'POST',
+                data:{
+                    csrfmiddlewaretoken:$('input[name="csrfmiddlewaretoken"]').val(),
+                    user:$('#user').val(),
+                    pwd:$('#pwd').val(),
+                    codeimg:$('#valid_code').val()
+                },
+                success:function(data){
+                    console.log(data);
+                    if(data.user){
+                        location.href ='/index';
+                    }else{
+                        $('#user').val('');
+                        $('#pwd').val('');
+                        $('.error').text(data.msg).css({
+                                'color':'red',
+                                'margin-left':'10px'
+                            });
+                        setTimeout(function () {
+                           $('.error').text('');
+                        },3000)
+                    }
+                },
+            })
+        }
+
+        {# 监听登录按钮#}
+        $('.login_btn').click(function(){
+            userlogin();
+        });
+
+        {# 监听回车按键#}
+        $('body').keydown(function(e){
+            if(event.keyCode == 13){
+              userlogin();
+            }
+        });
+
+    })
+</script>
+</html>

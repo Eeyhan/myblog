@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <link rel="stylesheet" href="/static/blogs/css/bootstrap.css">
+    <script type="text/javascript" src="/static/blogs/js/jquery-3.3.1.min.js"></script>
+    <style>
+        #upload_avatar_img {
+            width: 50px;
+            height: 50px;
+            margin-left: 10px;
+        }
+
+        #upload_avatar {
+            display: none;
+        }
+        .error{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3 class="btn btn-danger">用户注册</h3>
+    <div class="row">
+        <div class="col-md-4 col-lg-offset-4">
+            <form id="form">
+                {% csrf_token %}
+                {% for line in form %}
+                    <div class="form-group">
+                        <label for="{{ line.auto_id }}">{{ line.label }}</label>
+                        {{ line }} <span class="pull-right error"></span>
+                    </div>
+                {% endfor %}
+
+                <div class="form-group">
+                    <label for="upload_avatar">
+                        头像
+                        <img src="/media/avatar/default.jpg" id="upload_avatar_img">
+                    </label>
+                    <input type="file" id="upload_avatar">
+                </div>
+
+                <p class="error"></p>
+                <input type="button" class="btn btn-primary register_btn btn-block" value="立即注册">
+                <a href="/login/" class="btn btn-default btn-block">已有账号?</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+    $(function () {
+        {# 预览头像#}
+        $('#upload_avatar').change(function () {
+            var img = $(this)[0].files[0];
+            var new_img = new FileReader();
+            new_img.readAsDataURL(img);
+            new_img.onload = function () {
+                $('#upload_avatar_img').attr({'src': new_img.result});
+            }
+
+        });
+        {# 注册#}
+        $('.register_btn').click(function () {
+            var formdata = new FormData();
+            var register_userinfo = $('#form').serializeArray();
+            $.each(register_userinfo,function(i,datas){
+                formdata.append(datas.name,datas.value);
+            });
+            var avatar_img = $('#upload_avatar')[0].files[0];
+            formdata.append('avatar',avatar_img);
+            $.ajax({
+                url: '',
+                type: 'POST',
+                data: formdata,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    console.log(data);
+                    if(data.user){
+                        location.href = '/login/'
+                    }else{
+                        // 清空错误信息
+                        $("span.error").html("");
+                        $(".form-group").removeClass("has-error");
+                        $.each(data.msg, function (field, error_list) {
+                            console.log(field, error_list);
+                            if (field=="__all__"){
+                                console.log('有全局钩子');
+                                $("#id_re_password").next().html(error_list[0]).parent().addClass("has-error");
+                            }
+                            $("#id_" + field).next().html(error_list[0]);
+                            $("#id_" + field).parent().addClass("has-error");
+                        })
+                    }
+                }
+            })
+        })
+    })
+</script>
+</html>

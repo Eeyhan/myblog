@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ username }}的博客页面</title>
+    <link rel="stylesheet" href="/static/blogs/css/bootstrap.css">
+    <script type="text/javascript" src="/static/blogs/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/static/blogs/js/bootstrap.min.js"></script>
+    <style>
+        li{list-style-type: none}
+
+{#        boostrap的图标#}
+        .glyphicon {
+            vertical-align: -1px;
+            color: #8c8c8c;
+            margin-right: 5px;
+        }
+
+{#        文章底部相关信息，日期，评论等#}
+        .article_footer{
+            color: #8c8c8c;
+            font-size: 14px;
+        }
+{#        点赞#}
+        #div_digg {
+            float: right;
+            margin-bottom: 10px;
+            margin-right: 30px;
+            font-size: 12px;
+            width: 125px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+{#        点赞触发的动态显示文字#}
+        .diggword{
+            color: #86898e;
+            float: left;
+            margin-top: 5%;
+            font-weight: bold;
+        }
+
+{#        点赞盒子#}
+        .diggit {
+            float: left;
+            width: 46px;
+            height: 52px;
+            background: url(/static/blogs/img/upup.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+{#        踩灭盒子#}
+        .buryit {
+            float: right;
+            margin-left: 20px;
+            width: 46px;
+            height: 52px;
+            background: url(/static/blogs/img/downdown.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+{#        作者信息#}
+        #author_profile {
+            float: left;
+            width: 280px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #000;
+            margin-left: 0;
+            font-size: 12px;
+        }
+
+
+        .author_profile_info {
+            float: left;
+            line-height: 18px;
+            width: 200px;
+        }
+        .author_avatar {
+            height: 48px;
+            width: 48px;
+            vertical-align: top;
+            float: left;
+            margin-right: 5px;
+            padding-top: 5px;
+            padding-left: 2px;
+            border: 0;
+        }
+
+        .author{
+            background-image: url(/static/blogs/img/icon_form.gif);
+            background-repeat: no-repeat;
+            border: 1px solid #ccc;
+            padding: 4px 4px 4px 30px;
+            width: 300px;
+            font-size: 13px;
+            background-position: 3px -3px;
+        }
+
+{#        评论框#}
+        #tbCommentBody{
+            width: 450px;
+            height: 250px;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            font-family: 'PingFang SC','Helvetica Neue','Helvetica','Arial',sans-serif;
+        }
+
+{#      评论列表#}
+        .comment_li{
+            margin-left: -30px;
+        }
+
+{#        回复盒子#}
+        .comment_reply{
+            display: inline-block;
+            margin-right: 1%;
+        }
+
+{#        评论正文#}
+        .comment_content{
+            border-radius: 8px;
+            border: 2px solid #f1f6fb;
+            background: #f1f6fb;
+            margin-top: 1%;
+            margin-bottom: 1%;
+            margin-left: 42px;
+            text-indent: 6px;
+            padding: 10px;
+        }
+
+{#        评论盒子父级#}
+        .inputs{
+            position: relative;
+        }
+
+{#        评论图标#}
+        .glyphicon-triangle-top{
+            position: absolute;
+            left: 58px;
+            top: -2px;
+            color: #f1f6fb;
+        }
+
+{#        评论头#}
+        .comment_title{
+            border-bottom: 1px solid #cacaca;
+            height: 30px;
+            margin-bottom: 2%;
+            background: #eff7f9dd;
+            line-height: 30px;
+            text-indent: 2px;
+        }
+        p.comment_time{
+            color:#969594;
+        }
+
+{#        评论图标颜色#}
+        .glyphicon-comment{
+            color: #8bdaf1;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-default navbar-static-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/{{ username }}">{{ username }}的个人博客</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/">博客园区首页</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><span class="glyphicon glyphicon-exclamation-sign"></span>消息通知</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">选项管理<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/backend">&nbsp;&nbsp;&nbsp; 后台管理</a></li>
+                        <li><a href="#">&nbsp;&nbsp;&nbsp; 账户设置</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/logout">&nbsp;&nbsp;&nbsp; 退出</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <b>
+                    <p>昵称：<a href="/{{ username }}">{{ username }}</a></p>
+                    <p>邮箱：{{ username.email }}</p>
+                    <p>注册时间：{{ username.create_time |date:'Y-m-d' }}</p>
+                </b>
+            </div>
+            {% load user_tag %}
+            {% get_param username %}
+        </div>
+        <div class="col-md-9">
+            {% block content %}
+            
+            {% endblock %}
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

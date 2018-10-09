@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% for article in article_list %}
+        <div class="form-group clearfix">
+            <div class="content_box">
+                <div class="content ">
+                    <a href="/{{ username }}/article/{{ article.id }}"><h4>{{ article }}</h4></a>
+                    <P class="content_desc">{{ article.desc }}</P>
+                </div>
+                <div class="article_footer pull-right ">
+                    posted @ <span>{{ article.create_time|date:'Y-m-d H:i:s' }}</span>
+                    <span>{{ article.user }}</span> <span>阅读(231)</span> <span>评论({{ article.comment_count }})</span>
+
+                    {# 判断当前用户是否是个人站点同名用户#}
+                    {# 如果是则直接跳转到后台编辑页面#}
+                    {# 如果不是则跳到自己的后台首页面#}
+                    {% if request.user == username %}
+                        <a href="/backend/{{ article.id }}/update">编辑</a>
+                    {% else %}
+                        <a href="/backend">编辑</a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% csrf_token %}
+    <div class="form-group clearfix">
+        <div class="content_box">
+            <div class="content ">
+                <a href="/{{ username }}/article/{{ article.id }}"><h4>{{ article }}</h4></a>
+                <P class="content_desc">{{ article.content |safe }}</P>
+            </div>
+            <hr>
+            {# 作者相关 #}
+            <div id="author_profile">
+                <div id="author_profile_info" class="author_profile_info">
+                    <div id="author_profile_detail" class="author_profile_info">
+                        <a href="/{{ username }}" target="_blank">
+                            <img src="/media/{{ username.avatar }}" class="author_avatar"></a>
+                        <a href="/{{ username }}">{{ username }}</a><br>
+                        <a href="#">粉丝 - 0</a><br>
+                        <a href="#">关注 - 0</a><br>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div id="author_profile_follow">
+                    <a href="javascript:void(0);">+加关注</a>
+                </div>
+            </div>
+            {# 点赞踩灭#}
+            <div id="div_digg">
+                <div class="diggit actions">
+                    <span class="diggnum" id="digg_count">{{ article.up_count }}</span>
+                </div>
+                <div class="buryit actions">
+                    <span class="burynum" id="bury_count">{{ article.down_count }}</span>
+                </div>
+                <div class="diggword" id="digg_tips">
+                </div>
+            </div>
+            {# 底部信息#}
+            <div class="clearfix"></div>
+            <div class="article_footer pull-right">
+                posted on <span>{{ article.create_time|date:'Y-m-d H:i:s' }}</span>
+                <span>{{ article.user }}</span> <span>阅读(231)</span> <span>评论({{article.comment_count }})</span>
+                <a href="/backend">编辑</a>
+            </div>
+        </div>
+    </div>
+
+    {#评论#}
+    <div class="comment from-group">
+        <div class="comment_title">
+            <span class="glyphicon glyphicon-comment"></span><span>评论区</span>
+        </div>
+        {% if comment_list %}
+            <ul class="comment_ul">
+                {% for comment in comment_list %}
+                    <li class="comment_li">
+                        <div class="comment_athor">
+                            <h5>
+                                <a href="#"># {{ forloop.counter }}楼</a> &nbsp;&nbsp;
+                                <a href="/{{ comment.user }}"><span>{{ comment.user }}</span></a>
+                                <a href="javascript:void(0)" class="reply comment_reply pull-right" username="{{ comment.user }}" comment_pk="{{ comment.pk }}">回复</a>
+                                {% if request.user == comment.user %}
+                                    <a href="javascript:void(0)" comment_id="{{ comment.id }}" article_id="{{ article_id }}" class="reply_delete comment_reply pull-right">删除</a>
+                                {% endif %}
+                            </h5>
+                        </div>
+
+{#                        评论正文#}
+                        <div class="inputs">
+                            <span class="glyphicon glyphicon-triangle-top"></span>
+                            <textarea class="comment_content"  disabled>{{ comment.content }}</textarea>
+                        </div>
+                        <div class="clearfix">
+                            <p class="comment_time pull-right">{{ comment.create_time|date:'Y-m-d H:i:s' }}</p>
+                        </div>
+                    <hr>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+
+    </div>
+    <div id="comment_form" class="form-group">
+        <p id="commentform_title" class="comment_title">发表您的评论</p>
+        <p>昵称：<input type="text" class="author" disabled="disabled" size="50" value="{{ request.user }}">
+        </p>
+        <p>评论内容：</p>
+        <div class="clear"></div>
+        <textarea id="tbCommentBody"></textarea><br>
+        <input type="button" class="submit_btn" value="提交评论">
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+
+            // 判断用户是否登录，将字段转换为js可识别的字段
+            var keyword = '{{ request.user.is_authenticated }}';
+            if(keyword == 'False'){
+                keyword = false
+            }else{
+                keyword = true
+            }
+
+            //点赞
+            $('#div_digg .actions').click(function () {
+                if(keyword==false){
+                    location.href = '/login/'
+                }else{
+                   var is_up = $(this).hasClass('diggit');
+                    {#不能在ajax里取dom,要在ajax外面取，马德调了半天#}
+                    var by_click_obj = $(this).children('span');
+                    $.ajax({
+                        url: '/diggit/',
+                        type: 'POST',
+                        data: {
+                            "csrfmiddlewaretoken": $("[name='csrfmiddlewaretoken']").val(),
+                            "is_up": is_up,
+                            "article_id":{{ article.id }}
+                        },
+                        success: function (data) {
+                            if (data.checked) {
+                                let param = data.hands ? '您已经推荐过!' : '您已经反对过!';
+                                $('.diggword').text(param);
+                                setTimeout(function () {
+                                    $('.diggword').text('')
+                                }, 2000);
+                            } else {
+                                var count = parseInt(by_click_obj.text());
+                                by_click_obj.text(count + 1);
+                                let checking = is_up ? '推荐成功！' : '反对成功!';
+                                $('.diggword').text(checking);
+                                setTimeout(function () {
+                                    $('.diggword').text('')
+                                }, 2000);
+                            }
+                        }
+                    })
+                }
+
+
+            });
+
+            //评论
+
+            var pid = '';  // 父评论id
+            $('.submit_btn').click(function () {
+                var content = $('#tbCommentBody').val();
+                var count_li = $('.comment_ul').length;
+                $.ajax({
+                    url: '/comment/',
+                    type: 'POST',
+                    data: {
+                        "csrfmiddlewaretoken": $("[name='csrfmiddlewaretoken']").val(),
+                        'article_id':{{ article_id }},
+                        'content': content,
+                        pid: pid
+                    },
+                    success: function (data) {
+                        let create_time = data.create_time;
+                        let user = data.username;
+                        let content = data.content;
+                        console.log(create_time);
+                        console.log(user);
+                        let html = `
+                        <li class="comment_li">
+                        <div class="comment_athor">
+                            <h5>
+                                <a href=""># 最新 </a> &nbsp;&nbsp;
+                                <a href="/{{ user }}"><span>{{ user }}</span></a>
+                                <a class="pull-right reply" username="{{ comment.user.username }}"
+                               comment_pk="{{ comment.pk }}">回复</a>
+                                <a href="/comment/{{ comment.id }}/delete/{{ username }}/{{ article_id }}/" class="reply pull-right">删除</a>
+                            </h5>
+                        </div>
+                        <div class="inputs">
+                            <span class="glyphicon glyphicon-triangle-top"></span>
+                            <textarea class="comment_content"  disabled>${content}</textarea>
+                        </div>
+                        <div class="clearfix">
+                            <p class="comment_time pull-right">${create_time}</p>
+                        </div>
+                    </li>
+                        `;
+                        $('.comment_ul').append(html);
+                    }
+                })
+
+
+            });
+
+
+            // 回复按钮事件
+
+            $(".reply").click(function () {
+                $('#tbCommentBody').focus();
+                var val = "@" + $(this).attr("username") + "\n";
+                $('#tbCommentBody').val(val);
+                pid = $(this).attr("comment_pk"); // 更改父评论id
+
+            });
+
+            // 删除评论
+
+            $('.reply_delete').click(function () {
+                let node = $(this).parent().parent().parent();
+
+                let article_id = $(this).attr('article_id');
+                let comment_id = $(this).attr('comment_id');
+                $.ajax({
+                    url:'/comment/delete/',
+                    type:'POST',
+                    data:{
+                        "csrfmiddlewaretoken": $("[name='csrfmiddlewaretoken']").val(),
+                        'article_id':article_id,
+                        'comment_id':comment_id
+                    },
+                    success: function (data) {
+                        if(data.msg){
+                            node.remove();
+                        }
+
+                    }
+                })
+            })
+        })
+
+    </script>
+{% endblock %}

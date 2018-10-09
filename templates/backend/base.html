@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>博客后台</title>
+    <link rel="stylesheet" href="/static/blogs/css/bootstrap.css">
+    <script type="text/javascript" src="/static/blogs/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/static/blogs/js/bootstrap.min.js"></script>
+
+    <style>
+        .header {
+            background: #e9edef;
+            text-indent: 10px;
+            line-height: 30px;
+            height: 30px;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            margin-left: 2%;
+            margin-right: 2%;
+        }
+
+        .option {
+            float: right;
+            margin-right: 2%;
+        }
+
+        .header a {
+            color: #716f6f;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <p class="title">
+        <a href="/backend">后台管理</a>
+        <a class="info" href="/">博客园区</a>
+        <a class="option" href="/logout/">退出</a>
+        <a class="option" href="/{{ request.user.username }}"><span
+                class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;{{ request.user.username }}</a>
+    </p>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="panel panel-info">
+                <div class="panel-heading">选项</div>
+                <div class="panel-body">
+                    <p class="active"><a href="/backend/">查看文章</a></p>
+                    <p><a href="/backend/add/">添加文章</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div>
+                {% block backend_content %}
+
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

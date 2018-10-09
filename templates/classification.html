@@ -1,0 +1,32 @@
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        <h3 class="panel-title">文章标签</h3>
+    </div>
+    <div class="panel-body">
+        {% for tag in tag_query %}
+            <a href="/{{ username }}/tag/{{ tag.title }}">{{ tag.title }}({{ tag.c|default:'0'}})</a>
+            <br>
+        {% endfor %}
+
+    </div>
+</div>
+<div class="panel panel-info">
+    <div class="panel-heading">文章分类</div>
+    <div class="panel-body">
+        {% for kind in kind_query %}
+            <a href="/{{ username }}/kind/{{ kind.title }}">{{ kind.title }}({{ kind.c|default:'0' }})</a>
+            <br>
+        {% endfor %}
+    </div>
+</div>
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title">随笔档案</h3>
+    </div>
+    <div class="panel-body">
+        {% for month,c in date_list %}
+            <a href="/{{ username }}/date/{{ month|date:'Y/m' }}">{{ month|date:'Y-m'}}({{ c|default:'0' }})</a>
+            <br>
+        {% endfor %}
+    </div>
+</div>
